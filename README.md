@@ -2,19 +2,19 @@
 
 ## Welcome! ##
 
-_Welcome text goes here._
-
-## Links to other content ##
-
-_Links go here._
-
-## Adding links
-
-_Steps for how to do this go here._
+This repo contains all currently available TeamDynamix quickstarts, scripts and documentation contributed by both TeamDynamix and the community.
 
 ## Contributing content
 
 We encourage you to contribute to this quickstart repo! Please check out the [Contributing Guide](../master/CONTRIBUTING.md) for guidelines about how to proceed.
+
+## Links to other content ##
+
+Any content which TeamDynamix has agreed to reference as further integration examples or documentation will be included here, along with a short description of what the linked content contains.
+
+## Adding links
+
+To get your external content linked to in this repo, please submit a pull request to this README file for review. Please note that we are only looking for integration examples with or documentation for the TeamDynamix software.
 
 ## Warranty ##
 
