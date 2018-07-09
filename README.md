@@ -14,7 +14,7 @@ _Steps for how to do this go here._
 
 ## Contributing content
 
-_Steps for how to contribute content go here._
+We encourage you to contribute to this quickstart repo! Please check out the [Contributing Guide](../blob/master/CONTRIBUTING.md) for guidelines about how to proceed.
 
 ## Warranty ##
 
