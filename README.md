@@ -6,7 +6,7 @@ This repo contains all currently available TeamDynamix quickstarts, scripts and 
 
 ## Contributing content
 
-We encourage you to contribute to this quickstart repo! Please check out the [Contributing Guide](../master/CONTRIBUTING.md) for guidelines about how to proceed.
+We encourage you to contribute to this quickstart repo! Please check out the [Contributing Guide](../master/CONTRIBUTING.md) for guidelines about how to proceed and our contributor Code of Conduct.
 
 ## Links to other content ##
 
