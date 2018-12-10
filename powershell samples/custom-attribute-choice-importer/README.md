@@ -13,25 +13,30 @@ This script will work on all TeamDynamix instances on **version 9.5 or higher**.
 ## Script Paramters ##
 This script requires all of following parameters to be set.
 
-**-fileLocation**
-Data Type: String
+**-fileLocation**  
+*Data Type: String*  
 The relative or absolute file path to the CSV file of choice data to be imported. The file **must** contain a column named **ChoiceName**. This is the column choice names are read out of.
 
--apiBaseUri
-Data Type: String
-The TeamDynamix Web API base URL. 
-For SaaS production this will be in the format of https://yourTeamDynamixDomain/TDWebApi/
-For SaaS sandbox this will be in the format of https://yourTeamDynamixDomain/SBTDWebApi/
+**-apiBaseUri**  
+*Data Type: String*  
+The TeamDynamix Web API base URL.  
+For SaaS production this will be in the format of https://yourTeamDynamixDomain/TDWebApi/  
+For SaaS sandbox this will be in the format of https://yourTeamDynamixDomain/SBTDWebApi/  
 For Installed (On-Prem) customers this will be in the format of https://yourTeamDynamixDomainAndPath/TDWebApi/
 
--apiWSBeid
-Data Type: String
+**-apiWSBeid**  
+*Data Type: String*  
 The TeamDynamix Web Services BEID value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services BEID value if you have the Admin permission to **Add BE Administrators**. You will need to generate a web services key and enabled key-based services for this value to appear.
 
--apiWSKey
-Data Type: String
+**-apiWSKey**  
+*Data Type: String*  
 The TeamDynamix Web Services Key value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services Key value if you have the Admin permission to **Add BE Administrators**. You will need to generate a web services key and enabled key-based services for this value to appear.
 
--attributeId
-Data Type: Integer
+**-attributeId**  
+*Data Type: Integer*  
 The ID of the custom attribute to import choices for.
+
+## Usage Example ##
+```powershell
+.\ImportCustomAttributeChoicesFromCsv.ps1 -fileLocation "pathToImportData\importData.csv" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin" -attributeId 1000
+```
