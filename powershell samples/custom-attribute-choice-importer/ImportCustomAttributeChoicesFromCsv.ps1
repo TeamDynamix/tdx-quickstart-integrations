@@ -231,7 +231,7 @@ if ($attributeId -le 0) {
 
 # 1. Read in contents of CSV file and count items to process.
 $csvData = Import-Csv $fileLocation
-$totalItemsCount = $csvData.Length
+$totalItemsCount = @($csvData).Count
 
 # Exit out if no data is found to import.
 if($totalItemsCount -le 0) {
