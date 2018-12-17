@@ -1,7 +1,7 @@
 # TDX Account/Department Importer
 
 ## Overview ##
-This PowerShell script will read account/department data from a .CSV file, connect to the TeamDynamix API and then save the new/updated data to the API. The script duplicate matches on the AccountCode column value and will not create duplicate entries. 
+This PowerShell script will read account/department data from a .CSV file, connect to the TeamDynamix API and then save the new/updated data to the API. The script duplicate matches on the **AccountCode** column value and will not create duplicate entries. 
 
 As account code is the identifying field for an account/department, this script cannot be used to update existing account code values. The script would simply create new account/department records, leaving the old records intact.
 
@@ -13,29 +13,27 @@ This script will work on all TeamDynamix instances on **version 10.2 or higher**
 ## Available CSV File Columns ##
 A sample template file is included in this folder named **importdata.csv**.  The file contains the following columns:
 
-<ul>
-  <li>Name - <em>Required</em></li>
-  <li>AccountCode - <em>Required</em> - Used for duplicate matching.</li>
-  <li>IsActive - Accepted values are `true` or `false`. During creation, all accounts are created as active. Only edits to existing accounts can deactivate an account.</li>
-  <li>Address1</li>
-  <li>Address2</li>
-  <li>Address3</li>
-  <li>Address4</li>
-  <li>City</li>
-  <li>StateAbbr - The two letter state abbreviation.</li>
-  <li>PostalCode</li>
-  <li>Country</li>
-  <li>Phone</li>
-  <li>Fax</li>
-  <li>Url</li>
-  <li>Notes</li>
-  <li>IndustryID - The TDX industry ID of the account. *Note that account industry cannot be cleared via the API, only set or changed.*</li>
-  <li>ManagerUsername - The globally unique (true) username of user who is the account manager. This value is shown in the Admin > Users & Roles > Users list page, Username column.</li>
-  <li>CustomAttribute-id - The format for any custom attribute columns. The column should start with `CustomAttribute-` after which you place the actual custom attribute ID. For instance, a column for a custom attribute with an ID of 100 would be `CustomAttribute-100`.</li>
-</ul>
+- **Name** - *Required*
+- **AccountCode** - *Required* - Used for duplicate matching.
+- **IsActive** - Accepted values are `true` or `false`. During creation, all accounts are created as active. Only edits to existing accounts can deactivate an account.
+- **Address1**
+- **Address2**
+- **Address3**
+- **Address4**
+- **City**
+- **StateAbbr** - The two letter state abbreviation.
+- **PostalCode**
+- **Country**
+- **Phone**
+- **Fax**
+- **Url**
+- **Notes**
+- **IndustryID** - The TDX industry ID of the account. *Note that account industry cannot be cleared via the API, only set or changed.*
+- **ManagerUsername** - The globally unique (true) username of user who is the account manager. This value is shown in the Admin > Users & Roles > Users list page, Username column.
+- **CustomAttribute-id** - The format for any custom attribute columns. The column should start with `CustomAttribute-` after which you place the actual custom attribute ID. For instance, a column for a custom attribute with an ID of 100 would be `CustomAttribute-100`.
 
 ### Custom Attribute Values ###
-For custom attributes which are *not* choice-based, simply enter the value desired. For date and datetime custom attributes, see the following KB for the proper format of date values: 
+For custom attributes which are *not* choice-based, simply enter the value desired. For date and datetime custom attributes, see the following KB for the proper format of date values:  
 https://solutions.teamdynamix.com/TDClient/KB/ArticleDet?ID=62569
 
 For custom attributes which *are* choice-based, enter choice names as the column values. For attributes which support multiple choices, use the `|` character to separate choice values. An example of a valid value for multiple choices might be `choiceName1|choiceName2|choiceName3`.
