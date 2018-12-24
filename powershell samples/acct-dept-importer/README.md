@@ -69,5 +69,5 @@ The TeamDynamix Web Services Key value. This is found in the TDAdmin application
 
 ## Usage Example ##
 ```powershell
-.\ImportCustomAttributeChoicesFromCsv.ps1 -fileLocation "pathToImportData\importData.csv" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin"
+.\ImportAccountsFromCsv.ps1 -fileLocation "pathToImportData\importData.csv" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin"
 ```

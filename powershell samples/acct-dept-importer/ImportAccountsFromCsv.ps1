@@ -188,7 +188,7 @@ function UpdateAccountFromCsv {
 	# IsActive
 	if((DoesCsvFileContainColumn -csvColumnHeaders $csvColumnHeaders -columnToFind "IsActive")) {
 		
-		if($csvRecord.IsActive -eq "true") {
+		if($csvRecord.IsActive.Trim() -eq "true") {
 			$acctToImport.IsActive = $true
 		} else {
 			$acctToImport.IsActive = $false
@@ -478,14 +478,14 @@ function ApiAuthenticateAndBuildAuthHeaders {
         [string]$apiWSKey
 	)
 	
-	# Set the user authentication URI and create an authentication JSON body.
+	# Set the admin authentication URI and create an authentication JSON body.
 	$authUri = $apiBaseUri + "api/auth/loginadmin"
     $authBody = [PSCustomObject]@{
         BEID=$apiWSBeid;
 	    WebServicesKey=$apiWSKey;
 	} | ConvertTo-Json
 	
-	# Call the user login API method and store the returned tokenn.
+	# Call the admin login API method and store the returned token.
 	# If this part fails, display errors and exit the entire script.
 	# We cannot proceed without authentication.
 	$authToken = try {
@@ -699,7 +699,7 @@ function RetrieveFullAccountDetails {
 		[Int32]$accountId
 	)
 
-	# Build URI to get all acct/dept records for the organization.
+	# Build URI to get the full account details.
     $getAcctUri = $apiBaseUri + "/api/accounts/$($accountId)"
 
 	# Get the data.
@@ -871,7 +871,7 @@ if($totalItemsCount -le 0) {
 $csvColumnHeaders = $acctCsvData[0].PSObject.Properties.Name
 if(!(DoesCsvFileContainColumn -csvColumnHeaders $csvColumnHeaders -columnToFind "Name")) {
     
-    Write-Log -level INFO -string "The file does not contain the required Name column. A Name column is required for the acct/dept import."
+    Write-Log -level ERROR -string "The file does not contain the required Name column. A Name column is required for the acct/dept import."
 	Write-Log -level INFO -string " "
 	Write-Log -level INFO -string "Exiting."
 	Write-Log -level INFO -string $processingLoopSeparator
@@ -881,7 +881,7 @@ if(!(DoesCsvFileContainColumn -csvColumnHeaders $csvColumnHeaders -columnToFind 
 
 if (!(DoesCsvFileContainColumn -csvColumnHeaders $csvColumnHeaders -columnToFind "AccountCode")) {
     
-    Write-Log -level INFO -string "The file does not contain the required AccountCode column. An AccountCode column is required for the acct/dept import."
+    Write-Log -level ERROR -string "The file does not contain the required AccountCode column. An AccountCode column is required for the acct/dept import."
 	Write-Log -level INFO -string " "
 	Write-Log -level INFO -string "Exiting."
 	Write-Log -level INFO -string $processingLoopSeparator
@@ -915,7 +915,7 @@ if(($csvColumnHeaders | Where-Object { $_.StartsWith($customAttrColPrefix, "Ordi
 	Write-Log -level INFO -string "Retrieving all acct/dept custom attribute data for the organization from the TeamDynamix Web API."
 	$acctCustAttrData = RetrieveAllAcctAttributesForOrganization -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri
 	$attrCount = 0
-	if($acctData -and @($acctCustAttrData).Count -gt 0) {
+	if($acctCustAttrData -and @($acctCustAttrData).Count -gt 0) {
 		$attrCount = @($acctCustAttrData).Count
 	}
 	Write-Log -level INFO -string "Found $($attrCount) acct/dept custom attribute(s) for this organization."
@@ -988,11 +988,12 @@ foreach($acctCsvRecord in $acctCsvData) {
 			# Get the full acct/dept information here. If this fails, the row has to be skipped.
 			# We cannot risk saving over an existing account and potentially erasing data.
 			Write-Log -level INFO -string "Detected an existing account (ID: $($acctToImport.ID)) on the server to update. Retrieving full account details from the API before updating values."
-			$acctToImport = RetrieveFullAccountDetails -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri -accountId $acctToImport.ID
+			$acctId = $acctToImport.ID
+			$acctToImport = RetrieveFullAccountDetails -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri -accountId $acctId
 			if(!$acctToImport) {
 
 				# Log that we did not find the account and skip this row.
-				Write-Log -level ERROR -string ("Row $($rowIndex) - Detected existing account (ID: $($acctToImport.ID)) to update but the account" +
+				Write-Log -level ERROR -string ("Row $($rowIndex) - Detected existing account (ID: $($acctId)) to update but the account" +
 					" could not be retrieved from the API. This row will be skipped since saving the import data might" +
 					" unintentially clear other fields on the account server-side.")
 				$failCount += 1
