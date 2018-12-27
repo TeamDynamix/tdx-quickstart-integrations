@@ -83,12 +83,12 @@ function PrintAsciiArtAndCredits {
 Write-Host " _____________   __  _                     _   _             
 |_   _|  _  \ \ / / | |                   | | (_)            
   | | | | | |\ V /  | |     ___   ___ __ _| |_ _  ___  _ __  
-  | | | | | |/   \  | |    / _ \ / __/ _\` | __| |/ _ \| '_ \ 
+  | | | | | |/   \  | |    / _ \ / __/ _`` | __| |/ _ \| '_ \ 
   | | | |/ // /^\ \ | |___| (_) | (_| (_| | |_| | (_) | | | |
  _\_/_|___/ \/   \/ \_____/\___/ \___\__,_|\__|_|\___/|_| |_|
 |_   _|                         | |                          
   | | _ __ ___  _ __   ___  _ __| |_ ___ _ __                
-  | || '_ \` _ \| '_ \ / _ \| '__| __/ _ \ '__|               
+  | || '_ `` _ \| '_ \ / _ \| '__| __/ _ \ '__|               
  _| || | | | | | |_) | (_) | |  | ||  __/ |                  
  \___/_| |_| |_| .__/ \___/|_|   \__\___|_|                  
                | |                                           
@@ -236,7 +236,7 @@ function UpdateLocationFromCsv {
 	# Latitude
 	if((DoesCsvFileContainColumn -csvColumnHeaders $csvColumnHeaders -columnToFind "Latitude")) {
 		
-		# Only parse out the the latitude if the column has value in it. Otherwise clear it.		
+		# Only parse out the latitude if the column has value in it. Otherwise clear it.		
 		if([string]::IsNullOrWhiteSpace($csvRecord.Latitude)) {
 			$locationToImport.Latitude = $null
 		} else {
@@ -264,7 +264,7 @@ function UpdateLocationFromCsv {
 	# Longitude
 	if((DoesCsvFileContainColumn -csvColumnHeaders $csvColumnHeaders -columnToFind "Longitude")) {
 		
-		# Only parse out the the longitude if the column has value in it. Otherwise clear it.		
+		# Only parse out the longitude if the column has value in it. Otherwise clear it.		
 		if([string]::IsNullOrWhiteSpace($csvRecord.Longitude)) {
 			$locationToImport.Longitude = $null
 		} else {
@@ -874,7 +874,7 @@ foreach($locationCsvRecord in $locationCsvData) {
     # If this is a null or empty string, skip this row.
     if([string]::IsNullOrWhiteSpace($locationExtId)) {
         
-        Write-Log -level ERROR -string "Row $($rowIndex) Required field ExternalID has no value. This row will be skipped."
+        Write-Log -level ERROR -string "Row $($rowIndex) - Required field ExternalID has no value. This row will be skipped."
         $failCount += 1
         $rowIndex += 1
         continue
@@ -913,7 +913,7 @@ foreach($locationCsvRecord in $locationCsvData) {
 
 			# If we did find the location, but the ID is 0, this means we already created a location
 			# for this location code in the same sheet. Log a warning and skip this row.
-			Write-Log -level WARN -string ("Row $($rowIndex) - A location with name `"$($locationName)`" and ExternalID" +
+			Write-Log -level WARN -string ("Row $($rowIndex) - A location with Name `"$($locationName)`" and ExternalID" +
 				" `"$($locationExtId)`" already had to be created earlier in this processing loop. To not create duplicate" +
 				" records on the server, this row will be skipped.")
 			$skipCount += 1
@@ -934,7 +934,6 @@ foreach($locationCsvRecord in $locationCsvData) {
 
     # Save location to API here
 	Write-Log -level INFO -string "Saving location with Name `"$($locationName)`" and ExternalID `"$($locationExtId)`" to the TeamDynamix API."
-	# TEMP
 	$saveSuccess = SaveLocationToApi -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri -locationToImport $locationToImport
 
     # If the save was successful, increment the success counter and add the new choice to list of existing choices.

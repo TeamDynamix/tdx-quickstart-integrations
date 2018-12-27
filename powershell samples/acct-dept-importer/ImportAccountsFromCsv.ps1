@@ -88,7 +88,7 @@ Write-Host " _____________   __   ___           _       _______           _
  _\_/_|___/ \/   \/ \_| |_/\___\___|\__/_/   |___/ \___| .__/ \__|
 |_   _|                         | |                    | |        
   | | _ __ ___  _ __   ___  _ __| |_ ___ _ __          |_|        
-  | || '_  _ \| '_ \ / _ \| '__| __/ _ \ '__|                    
+  | || '_ `` _ \| '_ \ / _ \| '__| __/ _ \ '__|                    
  _| || | | | | | |_) | (_) | |  | ||  __/ |                       
  \___/_| |_| |_| .__/ \___/|_|   \__\___|_|                       
                | |                                                
@@ -966,7 +966,7 @@ foreach($acctCsvRecord in $acctCsvData) {
     # If this is a null or empty string, skip this row.
     if([string]::IsNullOrWhiteSpace($acctCode)) {
         
-        Write-Log -level ERROR -string "Row $($rowIndex) Required field AccountCode has no value. This row will be skipped."
+        Write-Log -level ERROR -string "Row $($rowIndex) - Required field AccountCode has no value. This row will be skipped."
         $failCount += 1
         $rowIndex += 1
         continue
@@ -1005,7 +1005,7 @@ foreach($acctCsvRecord in $acctCsvData) {
 
 			# If we did find the account, but the ID is 0, this means we already created an account
 			# for this account code in the same sheet. Log a warning and skip this row.
-			Write-Log -level WARN -string ("Row $($rowIndex) - An acount with name `"$($acctName)`" and AccountCode" +
+			Write-Log -level WARN -string ("Row $($rowIndex) - An acount with Name `"$($acctName)`" and AccountCode" +
 				" `"$($acctCode)`" already had to be created earlier in this processing loop. To not create duplicate" +
 				" records on the server, this row will be skipped.")
 			$skipCount += 1
