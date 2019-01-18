@@ -351,7 +351,7 @@ function GetRateLimitWaitPeriodMs {
 	$duration = New-TimeSpan -Start ((Get-Date).ToUniversalTime()) -End $rateLimitReset
     $rateLimitMsPeriod = $duration.TotalMilliseconds + 5000
 
-    # Return the millisecond rate limit wait.    
+	# Return the millisecond rate limit wait.    
     return $rateLimitMsPeriod
 
 }
@@ -521,25 +521,26 @@ function RetrieveAllLocationRoomAttributesForOrganization {
 
 }
 
-function RetrieveFullLocationDetails {
+function RetrieveFullLocationRoomDetails {
 	param (
 		[System.Collections.Hashtable]$apiHeaders,
 		[string]$apiBaseUri,
-		[Int32]$locationId
+		[Int32]$locationId,
+		[Int32]$roomId
 	)
 
-	# Build URI to get the full location details.
-    $getLocationUri = $apiBaseUri + "/api/locations/$($locationId)"
+	# Build URI to get the full location room details.
+    $getRoomUri = $apiBaseUri + "/api/locations/$($locationId)/rooms/$($roomId)"
 
 	# Get the data.
-	$fullLocationInternal = $null
+	$fullRoomInternal = $null
 	try {
 
 		# Specifically use Invoke-WebRequest here so that we get response headers.
 		# We might need them to deal with rate-limiting.
-		$resp = Invoke-WebRequest -Method Get -Headers $apiHeaders -Uri $getLocationUri -ContentType "application/json"
-		Write-Log -level INFO -string "Location retrieved successfully."
-		$fullLocationInternal = ($resp | ConvertFrom-Json)
+		$resp = Invoke-WebRequest -Method Get -Headers $apiHeaders -Uri $getRoomUri -ContentType "application/json"
+		Write-Log -level INFO -string "Location room retrieved successfully."
+		$fullRoomInternal = ($resp | ConvertFrom-Json)
 
 	} catch {
 
@@ -555,13 +556,13 @@ function RetrieveFullLocationDetails {
 			Start-Sleep -Milliseconds $resetWaitInMs
 
 			# Now retry.
-			Write-Log -level INFO -string "Retrying API call to retrieve the full location details for location ID $($locationId)."
-			$fullLocationInternal = RetrieveFullLocationDetails -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri -locationId $locationId
+			Write-Log -level INFO -string "Retrying API call to retrieve the full location room details for location ID $($locationId) and room ID $($roomId)."
+			$fullRoomInternal = RetrieveFullLocationRoomDetails -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri -locationId $locationId -roomId $roomId
 
 		} else {
 
 			# Display errors and continue
-			Write-Log -level ERROR -string "Retrieving full location details for location ID $($locationId) failed:"
+			Write-Log -level ERROR -string "Retrieving full location room details for location ID $($locationId) and room ID $($roomId) failed:"
 			Write-Log -level ERROR -string ("Status Code - " + $statusCode)
 			Write-Log -level ERROR -string ("Status Description - " + $_.Exception.Response.StatusDescription)
 			Write-Log -level ERROR -string ("Error Message - " + $_.ErrorDetails.Message)
@@ -572,7 +573,7 @@ function RetrieveFullLocationDetails {
 	}
 
 	# Return the full location record.
-    return $fullLocationInternal
+    return $fullRoomInternal
 
 }
 
@@ -842,29 +843,12 @@ foreach($roomCsvRecord in $locRoomCsvData) {
 		# AN ID of 0 or less means we already created this location room earlier in the script.
 		if($roomToImport.ID -gt 0) {
 
-			# Get the full location and room information here. If this fails, the row has to be skipped.
+			# Get the full location room information here. If this fails, the row has to be skipped.
 			# We cannot risk saving over an existing location and potentially erasing data.
-			# FUTURE: This would be more accurate if there were an API endpoint to retrieve rooms by ID, but that is not currently possible.
 			Write-Log -level INFO -string ("Detected an existing location (ID: $($locationId)) and" +
 				" location room (ID: $($roomToImport.ID)) on the server to update. Retrieving full location and room details from the API before updating values.")
 			$roomId = $roomToImport.ID
-			$parentLocation = RetrieveFullLocationDetails -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri -locationId $locationId
-			if(!$parentLocation) {
-
-				# Log that we did not find the room and skip this row.
-				Write-Log -level ERROR -string ("Row $($rowIndex) - Detected existing location (ID: $($locationId))" +
-					" and location room (ID: $($roomId)) to update but the location and room information could not be retrieved" +
-					" from the API. This row will be skipped since saving the import data might" +
-					" unintentially clear other fields on the room server-side.")
-				$failCount += 1
-				$rowIndex += 1
-				continue
-			}
-
-			# Now that we have the latest location information, grab the latest room information.
-			# If for some reason the room disappeared, the row has to be skipped for the same reasons as before.
-			# FUTURE: This would be more accurate if there were an API endpoint to retrieve rooms by ID, but that is not currently possible.
-			$roomToImport = ($parentLocation | Select-Object -ExpandProperty Rooms | Where-Object { $_.ExternalID -eq $roomExtId } | Select-Object -First 1)
+			$roomToImport = RetrieveFullLocationRoomDetails -apiHeaders $apiHeaders -apiBaseUri $apiBaseUri -locationId $locationId -roomId $roomId
 			if(!$roomToImport) {
 
 				# Log that we did not find the room and skip this row.

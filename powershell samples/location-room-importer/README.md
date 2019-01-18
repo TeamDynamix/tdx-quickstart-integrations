@@ -7,9 +7,6 @@ As external ID is the identifying field for a location room, this script cannot 
 
 **CSV files must be in comma-separated format. Semicolons, pipes or any other delimiter are not supported.**
 
-### SPECIAL NOTE: ###
-Currently the TeamDynamix API *will not* properly retrieve saved custom attribute values for location rooms. This means the import will blank out saved custom attribute values for location rooms if the import file does not properly set every location room custom attribute field properly. A design change is being investigated for the location room API endpoints, but for now, the safest course of action is to specify values for all location room custom attributes on each record in the import file. This script will be updated as the API behavior changes (hopefully such that this workaround is not needed).
-
 ## TeamDynamix Version Support ##
 This script will work on all TeamDynamix instances on **version 10.2 or higher**.
 
