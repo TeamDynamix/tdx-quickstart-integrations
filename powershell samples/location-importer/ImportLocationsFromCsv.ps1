@@ -827,7 +827,10 @@ $locationData = RetrieveAllLocationsForOrganization -apiHeaders $apiHeaders -api
 $locationCount = 0
 if($locationData -and @($locationData).Count -gt 0) {
     $locationCount = @($locationData).Count
+} else {
+	$locationData = @() # Initialize to empty array if no existing data is found on the server.
 }
+
 Write-Log -level INFO -string "Found $($locationCount) locations record(s) for this organization."
 
 # 4. Retrieve all location custom attribute data for the organization if we have any custom attribute columns mapped.

@@ -905,7 +905,10 @@ $acctData = RetrieveAllAcctDeptsForOrganization -apiHeaders $apiHeaders -apiBase
 $acctCount = 0
 if($acctData -and @($acctData).Count -gt 0) {
     $acctCount = @($acctData).Count
+} else {
+	$acctData = @() # Initialize to empty array if no existing data is found on the server.
 }
+
 Write-Log -level INFO -string "Found $($acctCount) acct/dept record(s) for this organization."
 
 # 4. Retrieve all acct/dept custom attribute data for the organization if we have any custom attribute columns mapped.
