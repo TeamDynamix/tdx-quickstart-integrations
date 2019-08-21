@@ -998,7 +998,7 @@ foreach($acctCsvRecord in $acctCsvData) {
 				# Log that we did not find the account and skip this row.
 				Write-Log -level ERROR -string ("Row $($rowIndex) - Detected existing account (ID: $($acctId)) to update but the account" +
 					" could not be retrieved from the API. This row will be skipped since saving the import data might" +
-					" unintentially clear other fields on the account server-side.")
+					" unintentionally clear other fields on the account server-side.")
 				$failCount += 1
 				$rowIndex += 1
 				continue
@@ -1008,7 +1008,7 @@ foreach($acctCsvRecord in $acctCsvData) {
 
 			# If we did find the account, but the ID is 0, this means we already created an account
 			# for this account code in the same sheet. Log a warning and skip this row.
-			Write-Log -level WARN -string ("Row $($rowIndex) - An acount with Name `"$($acctName)`" and AccountCode" +
+			Write-Log -level WARN -string ("Row $($rowIndex) - An account with Name `"$($acctName)`" and AccountCode" +
 				" `"$($acctCode)`" already had to be created earlier in this processing loop. To not create duplicate" +
 				" records on the server, this row will be skipped.")
 			$skipCount += 1
