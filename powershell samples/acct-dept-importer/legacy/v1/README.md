@@ -1,4 +1,4 @@
-# TDX Account/Department Importer 2.0.0
+# TDX Account/Department Importer 1.0.0
 
 ## Overview ##
 This PowerShell script will read account/department data from a .CSV file, connect to the TeamDynamix API and then save the new/updated data to the API. The script duplicate matches on the **AccountCode** column value and will not create duplicate entries. 
@@ -8,18 +8,13 @@ As account code is the identifying field for an account/department, this script 
 **CSV files must be in comma-separated format. Semicolons, pipes or any other delimiter are not supported.**
 
 ## TeamDynamix Version Support ##
-This script will work on all TeamDynamix instances on **version 11.0 or higher**.
-
-If you are an installed (on-prem) customer and need an earlier version of this script, use the list below for previous versions.
-- <a href="legacy/v1" target="_blank">Versions 10.2 - 10.3: legacy/v1/</a>
+This script will work on all TeamDynamix instances on **version 10.2 - 10.3**.
 
 ## Available CSV File Columns ##
 A sample template file is included in this folder named **importdata.csv**.  The file contains the following columns:
 
 - **Name** - *Required*
 - **AccountCode** - *Required* - Used for duplicate matching.
-- **ParentAccountCode** - The *AccountCode* value of the parent account. This is matched in a case-insensitive manner. To load an account hierarchy, ensure that all top-level accounts are first, 
-then second-level accounts, then third-level accounts and so on.
 - **IsActive** - Accepted values are `true` or `false`. During creation, all accounts are created as active. Only edits to existing accounts can deactivate an account.
 - **Address1**
 - **Address2**

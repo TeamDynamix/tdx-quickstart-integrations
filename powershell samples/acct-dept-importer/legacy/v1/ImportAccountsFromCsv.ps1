@@ -1,4 +1,4 @@
-# Script Version: 2.0.0
+# Script Version: 1.0.0
 
 # Params
 Param(
@@ -125,8 +125,7 @@ function GetNewAccountObject {
     # This will need to be updated should the Account object ever change.
     $newAcct = [PSCustomObject]@{
 		ID=0;
-		Name="";
-		ParentID=$null;
+        Name="";
         IsActive=$true;
         Address1="";
         Address2="";
@@ -176,8 +175,7 @@ function IsChoiceBasedCustomAttribute {
 function UpdateAccountFromCsv {
     Param (
 		[Int32]$rowIndex,
-		$acctData,
-		$userData,		
+		$userData,
 		$customAttributeData,
         [Array]$csvColumnHeaders,
         [Array]$csvRecord,
@@ -274,14 +272,6 @@ function UpdateAccountFromCsv {
 
 	}
 
-	# ParentAccountCode
-	$acctToImport = SetAccountParent `
-		-rowIndex $rowIndex `
-		-acctData $acctData `
-		-csvColumnHeaders $csvColumnHeaders `
-		-csvRecord $csvRecord `
-		-acctToImport $acctToImport
-
 	# ManagerUsername
 	$acctToImport = SetAccountManager `
 		-rowIndex $rowIndex `
@@ -339,52 +329,6 @@ function SetAccountManager {
 				$acctToImport.ManagerUID = [GUID]::Parse($managerUid)
 				
 			}
-		}
-	}
-
-	# Return the updated account.
-	return $acctToImport
-
-}
-
-function SetAccountParent {
-	param (
-		[Int32]$rowIndex,
-		$acctData,
-		[Array]$csvColumnHeaders,
-		[Array]$csvRecord,
-		[PSCustomObject]$acctToImport  
-	)
-
-	# ParentAccountCode
-	if((DoesCsvFileContainColumn -csvColumnHeaders $csvColumnHeaders -columnToFind "ParentAccountCode")) {
-
-		# Determine how to properly set parent ID.
-		if([string]::IsNullOrWhiteSpace($csvRecord.ParentAccountCode)) {
-	
-			# No parent account code was detected. Set the parent ID to null so that it blanks out.
-			$acctToImport.ParentID = $null
-
-		} else {
-
-			# Try to find the parent account by account code value.
-			$parentCodeToFind = $csvRecord.ParentAccountCode.Trim()
-			$parentAcct = ($acctData | Where-Object { $_.Code -eq $parentCodeToFind } | Select-Object -First 1)
-			if(!$parentAcct) {
-
-				# If we had a parent account code but could find no match for the new value, leave
-				# this field untouched. Instead log a warning and move on.
-				Write-Log -level WARN -string ("Row $($rowIndex) - ParentAccountCode value of `"$($parentCodeToFind)`"" +
-					" is not a valid TeamDynamix acct/dept code. The account parent value will be left unchanged when the account is saved" +
-					" to the server.")
-
-			} else {
-
-				# An account match was found for parent account. Set the parent account with the found account's ID.
-				$acctToImport.ParentID = $parentAcct.ID
-
-			}
-
 		}
 	}
 
@@ -834,13 +778,10 @@ function SaveAccountToApi {
 
 	try {
 
-		$savedAcctResp = Invoke-WebRequest -Method $method -Headers $apiHeaders -Uri $saveAcctUri -Body $acctToImportJson -ContentType "application/json"
+		Invoke-WebRequest -Method $method -Headers $apiHeaders -Uri $saveAcctUri -Body $acctToImportJson -ContentType "application/json"
 		Write-Log -level INFO -string "Account saved successfully."
 		$saveSuccessful = $true
-		
-		# Reset the local acct/dept variable ID with the response from the web server.
-		$acctToImport.ID = ($savedAcctResp | ConvertFrom-Json).ID
-		
+
 	} catch {
 
 		# If we got rate limited, try again after waiting for the reset period to pass.
@@ -1083,15 +1024,11 @@ foreach($acctCsvRecord in $acctCsvData) {
     # Update the account from the CSV data as needed.
     $acctToImport = UpdateAccountFromCsv `
 		-rowIndex $rowIndex `
-		-acctData $acctData `
 		-userData $userData `
 		-customAttributeData $acctCustAttrData `
 		-csvColumnHeaders $csvColumnHeaders `
 		-csvRecord $acctCsvRecord `
 		-acctToImport $acctToImport
-
-	# Store whether or not this will be a newly created record or not.
-	$isCreating = ($acctToImport.ID -le 0) 
 
     # Save account to API here
 	Write-Log -level INFO -string "Saving account with Name `"$($acctName)`" and AccountCode `"$($acctCode)`" to the TeamDynamix API."
@@ -1102,19 +1039,13 @@ foreach($acctCsvRecord in $acctCsvData) {
 	if($saveSuccess) {
 		
 		# Add the new acct/dept to the collection of existing acct/depts if it was newly created.
-		if($isCreating) {
-			
-			# Now add the newly created account to the local collection of all acct/dept data.
+		if($acctToImport.ID -le 0) {
+            
 			$acctData += $acctToImport
-
-			# Increment the creation counter.
 			$createCount += 1
 
         } else {
-			
-			# Increment the update counter.
 			$updateCount += 1
-
 		}
 
 		# Increment the success counter.
