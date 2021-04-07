@@ -12,6 +12,9 @@ Param(
     [int]$attributeId
 )
 
+# Force TLS 1.2 Usage
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 # Global Variables
 $scriptPath = Split-Path -parent $MyInvocation.MyCommand.Definition
 $scriptName = ($MyInvocation.MyCommand.Name -split '\.')[0]
