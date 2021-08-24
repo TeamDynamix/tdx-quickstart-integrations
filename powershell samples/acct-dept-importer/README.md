@@ -1,7 +1,7 @@
-# TDX Account/Department Importer 2.0.0
+# TDX Account/Department Importer 3.0.0
 
 ## Overview ##
-This PowerShell script will read account/department data from a .CSV file, connect to the TeamDynamix API and then save the new/updated data to the API. The script duplicate matches on the **AccountCode** column value and will not create duplicate entries. 
+This PowerShell script will read account/department data from all .CSV files in a monitored folder, connect to the TeamDynamix API and then save the new/updated data to the API. Processed files will then be moved to a processed folder. The script duplicate matches on the **AccountCode** column value and will not create duplicate entries. 
 
 As account code is the identifying field for an account/department, this script cannot be used to update existing account code values. The script would simply create new account/department records, leaving the old records intact.
 
@@ -12,6 +12,9 @@ This script will work on all TeamDynamix instances on **version 11.0 or higher**
 
 If you are an installed (on-prem) customer and need an earlier version of this script, use the list below for previous versions.
 - <a href="legacy/v1" target="_blank">Versions 10.2 - 10.3: legacy/v1/</a>
+
+## Usage Requirements ##
+This script requires **.NET Framework 4.0 or higher be installed.**
 
 ## Available CSV File Columns ##
 A sample template file is included in this folder named **importdata.csv**.  The file contains the following columns:
@@ -53,9 +56,13 @@ If you want to clear values, be sure that you provide a column for the field you
 ## Script Paramters ##
 This script requires all of following parameters to be set.
 
-**-fileLocation**  
+**-monitorFolder**  
 *Data Type: String*  
-The relative or absolute file path to the CSV file of account/department data to be imported. The file **must** contain columns named **Name** and **AccountCode**. These are the required fields to create and duplicate match records with.
+The relative or absolute path to the directory containg CSV files of account/department data to be imported. All files **must** contain columns named **Name** and **AccountCode**. These are the required fields to create and duplicate match records with.
+
+**-processedFolder**  
+*Data Type: String*  
+The relative or absolute path to the directory for processed files to be moved into after the import completes. Processed files will be prefixed with a `yyyy-MM-dd HHmmssffff ` timestamp.
 
 **-apiBaseUri**  
 *Data Type: String*  
@@ -72,7 +79,21 @@ The TeamDynamix Web Services BEID value. This is found in the TDAdmin applicatio
 *Data Type: String*  
 The TeamDynamix Web Services Key value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services Key value if you have the Admin permission to **Add BE Administrators**. You will need to generate a web services key and enabled key-based services for this value to appear.
 
+**-maxJsonObjectSizeInBytes**  
+*Data Type: Integer*
+The maximum size in bytes for downloaded JSON payloads. The default is 104857600 which is roughly equivalent to 100 megabytes (MB). You likely won't need to increase this, but if your user base data (for manager matching) or account data is especially large, this gives you an option to.
+
+**-verboseLog**  
+*Data Type: Switch*  
+Whether or not to use verbose logging to get a more detailed look at each row being saved as files are processed.
+
 ## Usage Example ##
+**Without verbose logging:**  
 ```powershell
-.\ImportAccountsFromCsv.ps1 -fileLocation "pathToImportData\importData.csv" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin"
+.\ImportAccountsFromCsv.ps1 -monitorFolder "path\To\Import\Data\Pending\" -processedFolder "path\To\Import\Data\Submitted" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin"
+```
+
+**With verbose logging:**  
+```powershell
+.\ImportAccountsFromCsv.ps1 -monitorFolder "path\To\Import\Data\Pending\" -processedFolder "path\To\Import\Data\Submitted" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin" -verboseLog
 ```
