@@ -10,9 +10,9 @@ As account code is the identifying field for an account/department, this script 
 ## TeamDynamix Version Support ##
 This script will work on all TeamDynamix instances on **version 11.0 or higher**.
 
-If you are an installed (on-prem) customer and need an earlier version of this script, use the list below for previous versions.
+If you are an installed (on-prem) customer or need an earlier version of this script, use the list below for previous versions.
 - <a href="legacy/v1" target="_blank">Versions 10.2 - 10.3: legacy/v1/</a>
-- <a href="legacy/v2" target="_blank">Versions 11.0+: legacy/v2/</a>
+- <a href="legacy/v2" target="_blank">Version 11.0+: legacy/v2/</a>
 
 ## Usage Requirements ##
 This script requires **.NET Framework 4.0 or higher be installed.**
@@ -55,7 +55,7 @@ For instance, if you do not provide the account/department Address4 field, that 
 If you want to clear values, be sure that you provide a column for the field you want to clear and leave the cell values blank.
 
 ## Script Paramters ##
-This script requires all of following parameters to be set.
+This script requires all of following parameters to be set unless otherwise marked as optional.
 
 **-monitorFolder**  
 *Data Type: String*  
@@ -74,18 +74,20 @@ For Installed (On-Prem) customers this will be in the format of https://yourTeam
 
 **-apiWSBeid**  
 *Data Type: String*  
-The TeamDynamix Web Services BEID value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services BEID value if you have the Admin permission to **Add BE Administrators**. You will need to generate a web services key and enabled key-based services for this value to appear.
+The TeamDynamix Web Services BEID value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services BEID value if you have the Admin permission to **Add BE Administrators**.
 
 **-apiWSKey**  
 *Data Type: String*  
-The TeamDynamix Web Services Key value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services Key value if you have the Admin permission to **Add BE Administrators**. You will need to generate a web services key and enabled key-based services for this value to appear.
+The TeamDynamix Web Services Key value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the **Admin Service Accounts (and their associated web services keys)** if you have the Admin permission to **Add BE Administrators**. You will need to create at least one **Admin Service Account** to get a web services key value.
 
 **-maxJsonObjectSizeInBytes**  
-*Data Type: Integer*
+*Data Type: Integer*  
+*Optional (default value is 104857600)*  
 The maximum size in bytes for downloaded JSON payloads. The default is 104857600 which is roughly equivalent to 100 megabytes (MB). You likely won't need to increase this, but if your user base data (for manager matching) or account data is especially large, this gives you an option to.
 
 **-verboseLog**  
 *Data Type: Switch*  
+*Optional*  
 Whether or not to use verbose logging to get a more detailed look at each row being saved as files are processed.
 
 ## Usage Example ##
