@@ -1,7 +1,7 @@
-# TDX Location Importer 2.0.0
+# TDX Location Importer
 
 ## Overview ##
-This PowerShell script will read location data from all .CSV files in a monitored folder, connect to the TeamDynamix API and then save the new/updated data to the API. Processed files will then be moved to a processed folder. The script duplicate matches on the **ExternalID** column value and will not create duplicate entries. 
+This PowerShell script will read location data from a .CSV file, connect to the TeamDynamix API and then save the new/updated data to the API. The script duplicate matches on the **ExternalID** column value and will not create duplicate entries. 
 
 As external ID is the identifying field for a location, this script cannot be used to update existing external ID values. The script would simply create new location records, leaving the old records intact.
 
@@ -9,12 +9,6 @@ As external ID is the identifying field for a location, this script cannot be us
 
 ## TeamDynamix Version Support ##
 This script will work on all TeamDynamix instances on **version 10.2 or higher**.
-
-If you are an installed (on-prem) customer or need an earlier version of this script, use the list below for previous versions.
-- <a href="legacy/v1" target="_blank">Version 11.0+: legacy/v1/</a>
-
-## Usage Requirements ##
-This script requires **.NET Framework 4.0 or higher be installed.**
 
 ## Available CSV File Columns ##
 A sample template file is included in this folder named **importdata.csv**.  The file contains the following columns:
@@ -47,15 +41,11 @@ For instance, if you do not provide the location Address field, that value will 
 If you want to clear values, be sure that you provide a column for the field you want to clear and leave the cell values blank.
 
 ## Script Paramters ##
-This script requires all of following parameters to be set unless otherwise marked as optional.
+This script requires all of following parameters to be set.
 
-**-monitorFolder**  
+**-fileLocation**  
 *Data Type: String*  
-The relative or absolute path to the directory containg CSV files of location data to be imported. All files **must** contain columns named **Name** and **ExternalID**. These are the required fields to create and duplicate match records with.
-
-**-processedFolder**  
-*Data Type: String*  
-The relative or absolute path to the directory for processed files to be moved into after the import completes. Processed files will be prefixed with a `yyyy-MM-dd HHmmssffff ` timestamp.
+The relative or absolute file path to the CSV file of location data to be imported. The file **must** contain columns named **Name** and **ExternalID**. These are the required fields to create and duplicate match records with.
 
 **-apiBaseUri**  
 *Data Type: String*  
@@ -66,32 +56,13 @@ For Installed (On-Prem) customers this will be in the format of https://yourTeam
 
 **-apiWSBeid**  
 *Data Type: String*  
-The TeamDynamix Web Services BEID value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services BEID value if you have the Admin permission to **Add BE Administrators**.
+The TeamDynamix Web Services BEID value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services BEID value if you have the Admin permission to **Add BE Administrators**. You will need to generate a web services key and enabled key-based services for this value to appear.
 
 **-apiWSKey**  
 *Data Type: String*  
-The TeamDynamix Web Services Key value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the **Admin Service Accounts (and their associated web services keys)** if you have the Admin permission to **Add BE Administrators**. You will need to create at least one **Admin Service Account** to get a web services key value.
-
-**-maxJsonObjectSizeInBytes**  
-*Data Type: Integer*  
-*Optional (default value is 104857600)*  
-The maximum size in bytes for downloaded JSON payloads. The default is 104857600 which is roughly equivalent to 100 megabytes (MB). You likely won't need to increase this, but if your user base data (for manager matching) or account data is especially large, this gives you an option to.
-
-**-verboseLog**  
-*Data Type: Switch*  
-*Optional*  
-Whether or not to use verbose logging to get a more detailed look at each row being saved as files are processed.
+The TeamDynamix Web Services Key value. This is found in the TDAdmin application organization details page. In this page, there is a **Security** box or Tab which shows the Web Services Key value if you have the Admin permission to **Add BE Administrators**. You will need to generate a web services key and enabled key-based services for this value to appear.
 
 ## Usage Example ##
-**Without verbose logging:**  
 ```powershell
 .\ImportLocationsFromCsv.ps1 -fileLocation "pathToImportData\importData.csv" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin"
 ```
-
-**With verbose logging:**  
-```powershell
-.\ImportLocationsFromCsv.ps1 -fileLocation "pathToImportData\importData.csv" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin" -verboseLog
-```
-
-## Logging ##
-A set of rolling log files are generated in the directory that the script is located. Logging will keep a maximum of ten rolling 10MB files at all times. To prevent logs from rolling excessively, it is recommended to leave verbose logging off unless you are experiencing errors with the import.
