@@ -54,7 +54,7 @@ For instance, if you do not provide the account/department Address4 field, that 
 
 If you want to clear values, be sure that you provide a column for the field you want to clear and leave the cell values blank.
 
-## Script Paramters ##
+## Script Parameters ##
 This script requires all of following parameters to be set unless otherwise marked as optional.
 
 **-monitorFolder**  
