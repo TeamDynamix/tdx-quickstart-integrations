@@ -353,9 +353,10 @@ function ProcessAllCsvFileData {
 					Write-Log -level ERROR -string ("Row $($rowIndex) - Detected existing account (ID: $($acctId)) to update but the account" +
 						" could not be retrieved from the API. This row will be skipped since saving the import data might" +
 						" unintentionally clear other fields on the account server-side.")
-					$resultsFailCount += 1
+					$results.FailCount += 1
 					$rowIndex += 1
 					continue
+
 				}
 
 			}
@@ -398,7 +399,6 @@ function ProcessAllCsvFileData {
 			if ($isCreating) {
 				
 				# Now add the newly created account to the local collection of all acct/dept data.
-				#$acctDataG += $acctToImport
 				$acctDataG.Add($acctToImport)
 				
 				# Increment the creation counter.
@@ -855,6 +855,7 @@ function MoveFileToProcessed {
 	}
 	
 }
+
 #endregion
 
 #region API Functions
@@ -959,7 +960,7 @@ function RetrieveAllUsersForOrganization {
 
 			# Now retry.
 			Write-Log -level INFO -string "Retrying API call to retrieve all User typed user data for the organization."
-			$userDataInternal = RetrieveAllUsersForOrganization
+			$userDataArrayList = RetrieveAllUsersForOrganization
 
 		}
 		else {
@@ -1029,7 +1030,7 @@ function RetrieveAllAcctDeptsForOrganization {
 
 			# Now retry.
 			Write-Log -level INFO -string "Retrying API call to retrieve all acct/dept data for the organization."
-			$acctDataInternal = RetrieveAllAcctDeptsForOrganization
+			$acctDataArrayList = RetrieveAllAcctDeptsForOrganization
 
 		}
 		else {
@@ -1065,7 +1066,7 @@ function RetrieveAllAcctAttributesForOrganization {
 		# We might need them to deal with rate-limiting.
 		$resp = Invoke-WebRequest -Method Get -Headers $apiHeaders -Uri $getAcctAttributesUri -ContentType "application/json"
 
-		# Use the custom JSON deserializer in case the organization has a large set of accounts.
+		# Use the custom JSON deserializer in case the organization has a large set of account attributes.
 		# Normally we would use this: $attrDataInternal = ($resp | ConvertFrom-Json)
 		$attrDataInternal = $jsonDeserializer.Deserialize($resp, [System.Object])
 		
@@ -1090,7 +1091,7 @@ function RetrieveAllAcctAttributesForOrganization {
 
 			# Now retry.
 			Write-Log -level INFO -string "Retrying API call to retrieve all acct/dept custom attribute data for the organization."
-			$attrDataInternal = RetrieveAllAcctAttributesForOrganization
+			$attrDataArrayList = RetrieveAllAcctAttributesForOrganization
 
 		}
 		else {
@@ -1294,9 +1295,9 @@ Write-Log -level INFO -string "Retrieving all User typed user data for the organ
 $global:userDataG = [System.Collections.ArrayList](RetrieveAllUsersForOrganization)
 Write-Log -level INFO -string "Found $(@($userDataG).Count) user(s) for this organization."
 
-#6. Process the files.
+# 6. Process the files.
 Write-Log -level INFO -string " "
-Write-Log -level INFO -string "Starting processing of acct CSV file(s)."
+Write-Log -level INFO -string "Starting processing of account CSV file(s)."
 $filesWithErrors = 0
 $filesWithRowsSkipped = 0
 foreach($file in $files) {
@@ -1335,7 +1336,7 @@ foreach($file in $files) {
 	# We found data. Proceed.
 	Write-Log -level INFO -string "Found $($totalItemsCount) item(s) to process."
 
-	# 7. Now loop through the CSV data and save it.
+	# Now loop through the CSV data and save it.
 	Write-Log -level INFO -string "Starting processing of CSV data."
 	$processingResults = ProcessAllCsvFileData -csvRecords $acctCsvData
 
