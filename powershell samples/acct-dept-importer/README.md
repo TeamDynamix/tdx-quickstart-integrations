@@ -98,3 +98,6 @@ Whether or not to use verbose logging to get a more detailed look at each row be
 ```powershell
 .\ImportAccountsFromCsv.ps1 -monitorFolder "path\To\Import\Data\Pending\" -processedFolder "path\To\Import\Data\Submitted" -apiBaseUri "https://yourTeamDynamixDomain/TDWebApi/" -apiWSBeid "apiWSBeidFromTDAdmin" -apiWSKey "apiWSKeyFromTDAdmin" -verboseLog
 ```
+
+## Logging ##
+A set of rolling log files are generated in the directory that the script is located. Logging will keep a maximum of ten rolling 10MB files at all times. To prevent logs from rolling excessively, it is recommended to leave verbose logging off unless you are experiencing errors with the import.
