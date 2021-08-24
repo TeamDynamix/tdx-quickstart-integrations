@@ -46,7 +46,7 @@ For instance, if you do not provide the location Address field, that value will 
 
 If you want to clear values, be sure that you provide a column for the field you want to clear and leave the cell values blank.
 
-## Script Paramters ##
+## Script Parameters ##
 This script requires all of following parameters to be set unless otherwise marked as optional.
 
 **-monitorFolder**  
