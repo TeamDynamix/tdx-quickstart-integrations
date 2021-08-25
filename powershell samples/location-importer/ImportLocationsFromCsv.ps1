@@ -274,6 +274,55 @@ function LoadAndValidateCsvFile {
 	
 }
 
+function GetProcessedModulusForPctCompLogging {
+	Param (
+		[int]$totalItemsCount
+	)
+
+	# Set a modulus count based on total item count, defaulting to 1.
+	# >10 and <=50 = mod 5
+	# >50 and <=100 = mod 10
+	# >100 and <=500 = mod 25
+	# >500 and <=1000 = mod 100
+	# >1000 and <=10000 = mod 250
+	# >10000 and <=100000 = mod 2500
+	# >100000 = mod 20000 (!)
+	$modCountInternal = 1
+	if($totalCsvRowsInternal -gt 10 -and $totalCsvRowsInternal -le 50) {
+
+		$modCountInternal = 5
+		if($totalCsvRowsInternal -gt 50 -and $totalCsvRowsInternal -le 100) {
+
+			$modCountInternal = 10
+			if($totalCsvRowsInternal -gt 100 -and $totalCsvRowsInternal -le 500) {
+				
+				$modCountInternal = 25
+				if($totalCsvRowsInternal -gt 500 -and $totalCsvRowsInternal -le 1000) {
+					
+					$modCountInternal = 100
+					if($totalCsvRowsInternal -gt 1000 -and $totalCsvRowsInternal -le 10000) {
+
+						$modCountInternal = 250
+						if($totalCsvRowsInternal -gt 10000 -and $totalCsvRowsInternal -le 100000) {
+							
+							$modCountInternal = 2500
+							if($totalCsvRowsInternal -gt 100000) {
+								$modCountInternal = 20000
+							}
+
+						}
+
+					}
+
+				}
+			}
+		}
+	}
+
+	# Return the modulus.
+	return $modCountInternal
+}
+
 function ProcessAllCsvFileData {
 	Param(
 		$csvRecords
@@ -287,6 +336,12 @@ function ProcessAllCsvFileData {
 		SkipCount=0;
 		FailCount=0;
 	}
+
+	# Get the total items count.
+	$totalCsvRowsInternal = @($csvRecords).Count
+
+	# Set a percent complete modulus count based on total item count, defaulting to 1.
+	$modCount = GetProcessedModulusForPctCompLogging -totalItemsCount $totalCsvRowsInternal
 
 	# Process the data.
 	$rowIndex = 2
@@ -305,9 +360,16 @@ function ProcessAllCsvFileData {
 		# If this is a null or empty string, skip this row.
 		if([string]::IsNullOrWhiteSpace($locationName)) {
 
+			# Log errors, increment failure count and row index.
 			Write-Log -level ERROR -string "Row $($rowIndex) - Required field Name has no value. This row will be skipped."
 			$results.FailCount += 1
 			$rowIndex += 1
+
+			# Log rows processed.
+			$processedCount = ($rowIndex - 2)		
+			LogPercentageFileProcessed -modCount $modCount -processedCount $processedCount -totalItemsCount $totalCsvRowsInternal
+
+			# Continue the loop.
 			continue
 
 		}
@@ -316,9 +378,16 @@ function ProcessAllCsvFileData {
 		# If this is a null or empty string, skip this row.
 		if([string]::IsNullOrWhiteSpace($locationExtId)) {
 			
+			# Log errors, increment failure count and row index.
 			Write-Log -level ERROR -string "Row $($rowIndex) - Required field ExternalID has no value. This row will be skipped."
 			$results.FailCount += 1
 			$rowIndex += 1
+
+			# Log rows processed.
+			$processedCount = ($rowIndex - 2)		
+			LogPercentageFileProcessed -modCount $modCount -processedCount $processedCount -totalItemsCount $totalCsvRowsInternal
+
+			# Continue the loop.
 			continue
 
 		}
@@ -421,10 +490,32 @@ function ProcessAllCsvFileData {
 		# Always increment the row counter.
 		$rowIndex += 1
 
+		# List out numbers of records processed and percent complete.
+		$processedCount = ($rowIndex - 2)		
+		LogPercentageFileProcessed -modCount $modCount -processedCount $processedCount -totalItemsCount $totalCsvRowsInternal
+
 	}
 
 	# Return the results.
 	return $results
+
+}
+
+function LogPercentageFileProcessed {
+	Param(
+		[int]$modCount,
+		[int]$processedCount,
+		[int]$totalItemCount
+	)
+
+	if($processedCount -ge $totalItemsCount) {
+		Write-Log -level INFO -string "Processed $($processedCount)/$($totalItemsCount) record(s) (100.00%)."
+	} elseif($processedCount % $modCount -eq 0) {
+
+		$currentPctComp = ([double]$processedCount / [double]$totalItemsCount)
+		Write-Log -level INFO -string "Processed $($processedCount)/$($totalItemsCount) record(s) ($($currentPctComp.ToString("P2")))."
+
+	}
 
 }
 
@@ -1127,12 +1218,16 @@ Write-Log -level INFO -string "Found $(@($locationCustAttrDataG).Count) location
 # 5. Process the files.
 Write-Log -level INFO -string " "
 Write-Log -level INFO -string "Starting processing of location CSV file(s)."
+$fileCounter = 1
 $filesWithErrors = 0
 $filesWithRowsSkipped = 0
 foreach($file in $files) {
 
 	# Log file start separator line.
 	Write-Log -level INFO -string " "
+	Write-Log -level INFO -string "Processing file $($fileCounter) out of $(@($files).Count)."
+	Write-Log -level INFO -string " "
+
 	Write-Log -level INFO -string $processingFileStartLine
 
 	# Validate and load the CSV file. If errors are encountered, exit out instead.
@@ -1196,6 +1291,9 @@ foreach($file in $files) {
 	# Move the file to processed and log file end separator line.
 	MoveFileToProcessed -file $file
 	Write-Log -level INFO -string $processingFileEndLine
+
+	# Increment file counter.
+	$fileCounter += 1
 
 }
 
