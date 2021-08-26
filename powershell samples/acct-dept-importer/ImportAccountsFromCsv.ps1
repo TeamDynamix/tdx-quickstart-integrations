@@ -290,35 +290,20 @@ function GetProcessedModulusForPctCompLogging {
 	# >10000 and <=100000 = mod 2500
 	# >100000 = mod 20000 (!)
 	$modCountInternal = 1
-	if($totalCsvRowsInternal -gt 10 -and $totalCsvRowsInternal -le 50) {
-
+	if($totalItemsCount -gt 10 -and $totalItemsCount -le 50) {
 		$modCountInternal = 5
-		if($totalCsvRowsInternal -gt 50 -and $totalCsvRowsInternal -le 100) {
-
-			$modCountInternal = 10
-			if($totalCsvRowsInternal -gt 100 -and $totalCsvRowsInternal -le 500) {
-				
-				$modCountInternal = 25
-				if($totalCsvRowsInternal -gt 500 -and $totalCsvRowsInternal -le 1000) {
-					
-					$modCountInternal = 100
-					if($totalCsvRowsInternal -gt 1000 -and $totalCsvRowsInternal -le 10000) {
-
-						$modCountInternal = 250
-						if($totalCsvRowsInternal -gt 10000 -and $totalCsvRowsInternal -le 100000) {
-							
-							$modCountInternal = 2500
-							if($totalCsvRowsInternal -gt 100000) {
-								$modCountInternal = 20000
-							}
-
-						}
-
-					}
-
-				}
-			}
-		}
+	} elseif($totalItemsCount -gt 50 -and $totalItemsCount -le 100) {
+		$modCountInternal = 10
+	} elseif($totalItemsCount -gt 100 -and $totalItemsCount -le 500) {
+		$modCountInternal = 25
+	} elseif($totalItemsCount -gt 500 -and $totalItemsCount -le 1000) {
+		$modCountInternal = 100
+	} elseif($totalItemsCount -gt 1000 -and $totalItemsCount -le 10000) {
+		$modCountInternal = 250
+	} elseif($totalItemsCount -gt 10000 -and $totalItemsCount -le 100000) {
+		$modCountInternal = 2500
+	} elseif($totalItemsCount -gt 100000) {
+		$modCountInternal = 20000
 	}
 
 	# Return the modulus.
