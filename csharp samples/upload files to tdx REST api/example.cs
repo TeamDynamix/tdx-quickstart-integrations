@@ -180,8 +180,8 @@ class TDApiHelpers
 	  MultipartFormDataContent formContent = new MultipartFormDataContent();
 
 	  // Add the file content to the form data for this call.
-	  var fileContent = new ByteArrayContent(File.ReadAllBytes(pendingFile.FullName));
-	  formContent.Add(fileContent, "attachment", Path.GetFileName(pendingFile.Name));
+	  var fileContent = new ByteArrayContent(File.ReadAllBytes(fileToUpload.FullName));
+	  formContent.Add(fileContent, "attachment", Path.GetFileName(fileToUpload.Name));
 
 	  // If we have a notify email address, add this as form data named notifyEmail.
 	  if (!string.IsNullOrWhiteSpace(notifyEmailAddress))
@@ -194,7 +194,7 @@ class TDApiHelpers
 	  }
 	  
 	  // Post the file to the API!
-	  Program.Log.Info($"Submitting import file {pendingFile.Name} to the TeamDynamix Web API.");
+	  Program.Log.Info($"Submitting import file {fileToUpload.Name} to the TeamDynamix Web API.");
 	  return apiClient.PostAsync($"api/people/import", formContent).Result;
 
 	}
